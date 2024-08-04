@@ -1,0 +1,50 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Match</title>
+    <style>
+        img {
+            max-width: 200px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload Image to Find Matches</h1>
+    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" required>
+        <button type="submit">Upload</button>
+    </form>
+    <div id="imagePreviews"></div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                const imagePreviews = document.getElementById('imagePreviews');
+                imagePreviews.innerHTML = ''; // Clear any existing previews
+
+                result.matches.forEach(match => {
+                    const img = document.createElement('img');
+                    img.src = match.url;
+                    img.alt = match.original;
+                    imagePreviews.appendChild(img);
+                });
+            } else {
+                console.error('Upload failed.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!-- views/display.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Matches</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .image-container img {
+            max-width: 200px; /* Adjust as needed */
+            max-height: 200px; /* Adjust as needed */
+            margin: 10px;
+            object-fit: contain; /* Maintain aspect ratio */
+        }
+        .message {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .preview-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Here are all matches:</h1>
+    
+    <% if (uploadedImage) { %>
+        <div class="preview-container">
+            <h2>Uploaded Image Preview</h2>
+            <img src="/uploads/<%= uploadedImage %>" alt="Uploaded Image">
+        </div>
+    <% } %>
+
+    <div class="message">
+        <%= message %>
+    </div>
+    
+    <div class="image-container">
+        <% images.forEach(image => { %>
+            <img src="/uploads/<%= image %>" alt="Matching Image">
+        <% }) %>
+    </div>
+
+    <br>
+    <a href="/">Back to upload page</a>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!-- views/index.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #preview-container img {
+            max-width: 100%;
+            height: auto;
+            max-height: 300px; /* Fixed height for consistent preview size */
+            object-fit: contain; /* Maintain aspect ratio */
+            margin-top: 20px;
+        }
+        .message {
+            color: red;
+            margin-top: 10px;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        #upload-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload an Image</h1>
+    <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+        <label for="category">Select Category:</label>
+        <select name="category" id="category" required>
+            <% categories.forEach(category => { %>
+                <option value="<%= category %>"><%= category %></option>
+            <% }) %>
+        </select>
+        <br><br>
+        <input type="file" name="image" id="image" accept="image/*" required>
+        <br><br>
+        <button type="submit" id="upload-button">Upload</button>
+        <br><br>
+        <div id="preview-container">
+            <!-- Preview will be shown here -->
+        </div>
+        <p id="error-message" class="error"></p>
+    </form>
+
+    <% if (error) { %>
+        <p class="message"><%= error %></p>
+    <% } %>
+
+    <script>
+        const categorySelect = document.getElementById('category');
+        const fileInput = document.getElementById('image');
+        const uploadButton = document.getElementById('upload-button');
+        const previewContainer = document.getElementById('preview-container');
+        const errorMessage = document.getElementById('error-message');
+
+        const validCategories = {
+            "wave tattoos": ["wave1.jpeg", "wave2.jpg", "wave3.jpg", "wave4.jpg", "wave5.jpeg"],
+            "eagle tattoos": ["eagle1.jpg", "eagle2.jpg", "eagle3.jpeg", "eagle4.jpg", "eagle5.jpeg"]
+        };
+
+        function validateFile() {
+            const selectedCategory = categorySelect.value;
+            const file = fileInput.files[0];
+
+            if (file) {
+                const fileName = file.name.toLowerCase();
+                const validFiles = validCategories[selectedCategory] || [];
+
+                if (!validFiles.includes(fileName)) {
+                    uploadButton.disabled = true;
+                    errorMessage.textContent = 'Error: The selected image does not match the selected category.';
+                } else {
+                    uploadButton.disabled = false;
+                    errorMessage.textContent = '';
+                }
+            } else {
+                uploadButton.disabled = true;
+                errorMessage.textContent = '';
+            }
+        }
+
+        categorySelect.addEventListener('change', validateFile);
+        fileInput.addEventListener('change', validateFile);
+
+        document.getElementById('upload-form').addEventListener('submit', function(event) {
+            if (uploadButton.disabled) {
+                event.preventDefault(); // Prevent form submission if the button is disabled
+            }
+        });
+
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = 'Image preview';
+                    previewContainer.innerHTML = '';
+                    previewContainer.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
